@@ -94,7 +94,7 @@ static const char* kDefaultLogFile                         =      "nul";
 #elif defined(ELPP_DEFAULT_LOG_FILE)
 static const char* kDefaultLogFile                         =      ELPP_DEFAULT_LOG_FILE;
 #else
-static const char* kDefaultLogFile                         =      "myeasylog.log";
+static const char* kDefaultLogFile                         =      "ergoMiner.log";
 #endif // defined(ELPP_NO_DEFAULT_LOG_FILE)
 
 

@@ -55,7 +55,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates)
     CUDA_CALL(cudaSetDevice(deviceId));
 
     char threadName[20];
-    sprintf(threadName, "GPU %i miner", deviceId);
+    sprintf(threadName, "GPU%i", deviceId);
     el::Helpers::setThreadName(threadName);    
 
     state_t state = STATE_KEYGEN;
@@ -136,6 +136,10 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates)
     //========================================================================//
     LOG(INFO) << "GPU " << deviceId << " allocating memory";
 
+    if (keepPrehash == 0) {
+        LOG(WARNING) << "Need around 5 minutes for initializing, during this period the miner takes 0 hashrate.";
+    }
+    
     // boundary for puzzle
     uint32_t * bound_d;
     // (2 * PK_SIZE_8 + 2 + 4 * NUM_SIZE_8 + 212 + 4) bytes // ~0 MiB
@@ -249,7 +253,18 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates)
 
             info->info_mutex.unlock();
 
-            LOG(INFO) << "GPU " << deviceId << " read new block data";
+            // for(int i = 0; i < NUM_SIZE_8; i++) {
+            //     printf("%02X", mes_h[i]);
+            // }
+            // printf("\n");
+
+            // for(int i = 0; i < NUM_SIZE_8; i++) {
+            //     printf("%02X", bound_h[i]);
+            // }
+            // printf("\n");
+
+
+            LOG(INFO) << "read NEW work";
             blockId = controlId;
             
             GenerateKeyPair(x_h, w_h);
@@ -330,8 +345,7 @@ void MinerThread(int deviceId, info_t * info, std::vector<double>* hashrates)
 
             
             PrintPuzzleSolution(nonce, res_h, logstr);
-            LOG(INFO) << "GPU " << deviceId
-            << " found and trying to POST a solution:\n" << logstr;
+            LOG(INFO) << "FOUND solution, trying to POST";
 
             PostPuzzleSolution(to, pkstr, w_h, nonce, res_h);
     
@@ -361,7 +375,7 @@ int main(int argc, char ** argv)
         el::ConfigurationType::Format, "%datetime %level [%thread] %msg"
     );
 
-    el::Helpers::setThreadName("main thread");
+    el::Helpers::setThreadName("Main");
 
     char logstr[1000];
 
@@ -383,7 +397,7 @@ int main(int argc, char ** argv)
                 GenerateSecKeyNew(
                     mnemonic.c_str(), strlen(mnemonic.c_str()), sk,
                     skstr, ""
-                );    
+                );
                 char logstr_gen[1000];
                 GeneratePublicKey(skstr, pkstr, pk);
                 PrintPublicKey(pkstr, logstr_gen);
@@ -448,8 +462,8 @@ int main(int argc, char ** argv)
     // generate public key from secret key
     GeneratePublicKey(info.skstr, info.pkstr, info.pk);
 
-    PrintPublicKey(info.pkstr, logstr);
-    LOG(INFO) << "Generated public key:\n   " << logstr;
+    // PrintPublicKey(info.pkstr, logstr);
+    // LOG(INFO) << "Generated public key:\n   " << logstr;
 
     //========================================================================//
     //  Setup CURL
@@ -492,7 +506,7 @@ int main(int argc, char ** argv)
     //  Main thread get-block cycle
     //========================================================================//
     uint_t curlcnt = 0;
-    const uint_t curltimes = 2000;
+    const uint_t curltimes = 100;
 
     milliseconds ms = milliseconds::zero(); 
 
@@ -517,23 +531,28 @@ int main(int argc, char ** argv)
 
         if (!(curlcnt % curltimes))
         {
-            LOG(INFO) << "Average curling time "
-                << ms.count() / (double)curltimes << " ms";
-            LOG(INFO) << "Current block candidate: " << request.ptr;
+            LOG(INFO) << "-------------------------------REPORT----------------------------------";
+            // char *MSG = "\0";
+            // strncat(MSG, request.GetTokenStart(9), 64);
+            // LOG(INFO) << "Current Work: " << MSG;
             ms = milliseconds::zero();
             std::stringstream hrBuffer;
-            hrBuffer << "Average hashrates: ";
+            hrBuffer << "Hashrates: ";
             double totalHr = 0;
             for(int i = 0; i < deviceCount; ++i)
             {
+                if (hashrates[i] == 0 && info.keepPrehash == 0)  {
+                    LOG(WARNING) << "Need around 5 minutes for initializing, during this period the miner takes 0 hashrate.";
+                } 
                 hrBuffer << "GPU" << i << " " << hashrates[i] << " MH/s ";
                 totalHr += hashrates[i];
             }
-            hrBuffer << "Total " << totalHr << " MH/s ";
+            hrBuffer << "Total " << totalHr << " MH/s (" << ms.count() / (double)curltimes << " ms)";
             LOG(INFO) << hrBuffer.str();
+            LOG(INFO) << "";
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(8));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }    
 
     return EXIT_SUCCESS;

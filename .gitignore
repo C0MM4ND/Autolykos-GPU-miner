@@ -5,3 +5,7 @@
 *.sh
 *.json
 *.log
+*.exp
+*.exe
+*.zip
+.vscode

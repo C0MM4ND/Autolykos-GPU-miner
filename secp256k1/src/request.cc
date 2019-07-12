@@ -229,7 +229,7 @@ int ParseRequest(json_t * oldreq , json_t * newreq, info_t *info, int checkPubKe
         
         // signaling uint
         ++(info->blockId);
-        LOG(INFO) << "Got new block in main thread, block data: " << newreq->ptr;
+        LOG(INFO) << "Got Work from POOL";
     }
 
     return EXIT_SUCCESS;
@@ -382,7 +382,7 @@ int PostPuzzleSolution(
     CurlLogError(curlError);
 
     LOG(INFO) << "Node response:" << respond.ptr;
-
+    
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
 

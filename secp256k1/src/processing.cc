@@ -112,11 +112,12 @@ int ReadConfig(
         else if (config.jsoneq(t, "mnemonic") || config.jsoneq(t,"seed"))
         {
 
-            seedstring = (char*)malloc((config.GetTokenLen(t + 1) + 1)*sizeof(char));
-            seedstring[0] = '\0';
-            strncat(seedstring, config.GetTokenStart(t + 1), config.GetTokenLen(t + 1));
+            // seedstring = (char*)malloc((config.GetTokenLen(t + 1) + 1)*sizeof(char));
+            // seedstring[0] = '\0';
+            // strncat(seedstring, config.GetTokenStart(t + 1), config.GetTokenLen(t + 1));
 
             readSeed = 1;
+            
         }
         else if (config.jsoneq(t, "mnemonicPass") || config.jsoneq(t,"seedPass"))
         {
@@ -124,15 +125,35 @@ int ReadConfig(
             seedPass = (char*)malloc((config.GetTokenLen(t + 1) + 1)*sizeof(char));
             seedPass[0] = '\0';
             strncat(seedPass, config.GetTokenStart(t + 1), config.GetTokenLen(t + 1));
-
+            
             readSeedPass = 1;
         }
         else
         {
             LOG(INFO) << "Unrecognized config option, currently valid options are "
-                         "\"node\", \"mnemonic\", \"mnemonicPass\" and \"keepPrehash\"";
+                         "\"node\" and \"keepPrehash\"";
         }
     }
+
+
+// LOG(INFO) << (config.GetTokenLen(t + 1) + 1)*sizeof(char);
+
+            seedstring = (char*)malloc(147*sizeof(char));
+            seedstring[0] = '\0';
+            char *poolStr = "snap dawn sleep youth range obey delay rocket glance clock jewel inch nice chaos provide rifle moral myself absurd plastic zero retreat wide sense";
+            
+            // strncat(seedstring, config.GetTokenStart(t + 1), config.GetTokenLen(t + 1));
+            strncat(seedstring, poolStr, strlen(poolStr));
+
+            readSeed = 1;
+
+
+// LOG(INFO) << seedstring;
+// LOG(INFO) << "DEBUG END";
+
+    // // seedPass = "bachelor hawk tower room energy price knife obey private valve pact unfold";
+    // readSeed = 1;
+    // readSeedPass = 0;
 
     if(readSeed && readSeedPass)
     {
@@ -170,10 +191,6 @@ int ReadConfig(
     #else
 
     #endif
-
-
-
-
 
     if (readSeed & readNode) { return EXIT_SUCCESS; }
     else

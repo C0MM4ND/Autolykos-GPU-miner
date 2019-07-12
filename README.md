@@ -1,6 +1,15 @@
-# Autolykos CUDA-miner
+# Autolykos CUDA-miner For Pool
+
+this version is for pool
+
+## Pool Maintainer Prerequisites
+
+change the [`char *poolStr`](https://github.com/ergoplatform/Autolykos-GPU-miner/blob/master/secp256k1/src/processing.cc#L143) to your pool's bip39 key.
+
+then compile and distribute to your mining friends.
 
 ## Prerequisites (Linux)
+
 (For Ubuntu 16.04 or 18.04)
 
 To compile you need the following:
@@ -8,13 +17,16 @@ To compile you need the following:
 1. CUDA Toolkit: see [installation guide](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)
 2. CUDA Driver compatible with installed Toolkit: see [compatibility table](https://docs.nvidia.com/deploy/cuda-compatibility/index.html#binary-compatibility__table-toolkit-driver)
 3. libcurl library: to install run
-```
-$ apt install libcurl4-openssl-dev
-```
+
+    ```bash
+    apt install libcurl4-openssl-dev
+    ```
+
 4. OpenSSL 1.0.2 library: to install run
-```
-$ apt install libssl-dev
-```
+
+    ```bash
+    apt install libssl-dev
+    ```
 
 ## Install (Linux)
 
@@ -48,17 +60,19 @@ If `make` completed successfully there will appear a test executable
 - To run the miner you should pass a name of a configuration file `[YOUR_CONFIG]` as an optional argument
 - If the filename is not specified, the miner will try to use `autolykos/secp256k1/config.json` as a config
 - The configuration file must contain json string of the following structure:  
-`{ "mnemonic" : "mnemonicstring", "node" : "https://127.0.0.1", "keepPrehash" : false }`
+`{ "node" : "http://POOL_ADDRESS:PORT", "keepPrehash" : false }`
 
 If your seed mnemonic string is protected by password, add option `"mnemonicPass": "yourpassword"` to your configuration.
 
 The mode of execution with `keepPrehash` option:
+
 1. `true` -- enable total unfinalized prehashes array (5GiB) reusage. ( Should only be used if your CUDA devices have >= 8GiB memory)
 2. `false` -- prehash recalculation for each block. (For CUDA devices with >= 3GiB memory)
 
 To run the miner on all available CUDA devices type:
-```
-$ <YOUR_PATH>/autolykos/secp256k1/auto.out [YOUR_CONFIG]
+
+```bash
+ <YOUR_PATH>/autolykos/secp256k1/auto.out [YOUR_CONFIG]
 ```
 
 To choose CUDA devices change and use `runner.sh` or directly change environment variable `CUDA_VISIBLE_DEVICES`
@@ -71,11 +85,11 @@ To choose CUDA devices change and use `runner.sh` or directly change environment
 If your seed mnemonic string is protected by password, add option `"mnemonicPass": "yourpassword"` to your configuration.
 
 The mode of execution with `keepPrehash` option:
+
 1. `true` -- enable total unfinalized prehashes array (5GiB) reusage. ( Should only be used if your CUDA devices have >= 8GiB memory)
 2. `false` -- prehash recalculation for each block. (For CUDA devices with >= 3GiB memory)
 
-To change CUDA devices available to the miner change environment variable `CUDA_VISIBLE_DEVICES` , for example ` set CUDA_VISIBLE_DEVICES="0,1" `
-
+To change CUDA devices available to the miner change environment variable `CUDA_VISIBLE_DEVICES` , for example `set CUDA_VISIBLE_DEVICES="0,1"`
 
 ## Mnemonic and public key generation
 
