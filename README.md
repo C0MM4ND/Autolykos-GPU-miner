@@ -60,7 +60,7 @@ If `make` completed successfully there will appear a test executable
 - To run the miner you should pass a name of a configuration file `[YOUR_CONFIG]` as an optional argument
 - If the filename is not specified, the miner will try to use `autolykos/secp256k1/config.json` as a config
 - The configuration file must contain json string of the following structure:  
-`{ "node" : "http://POOL_ADDRESS:PORT", "keepPrehash" : false }`
+`{ "node" : "http://POOL_ADDRESS:PORT/your_wallet_address_not_privatekey", "keepPrehash" : false }`
 
 If your seed mnemonic string is protected by password, add option `"mnemonicPass": "yourpassword"` to your configuration.
 
